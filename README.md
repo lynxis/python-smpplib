@@ -25,6 +25,8 @@ client.set_message_sent_handler(
     lambda pdu: sys.stdout.write('sent {} {}\n'.format(pdu.sequence, pdu.message_id)))
 client.set_message_received_handler(
     lambda pdu: sys.stdout.write('delivered {}\n'.format(pdu.receipted_message_id)))
+client.set_message_alert_handler(
+    lambda pdu: sys.stdout.write('alert {}, is now {} \n'.format(pdu.source_addr, pdu.ms_availability_status)))
 
 client.connect()
 client.bind_transceiver(system_id='login', password='secret')

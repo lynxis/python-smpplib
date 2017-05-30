@@ -38,6 +38,7 @@ def factory(command_name, **kwargs):
 
     try:
         return {
+            'alert_notification': AlertNotification,
             'bind_transmitter': BindTransmitter,
             'bind_transmitter_resp': BindTransmitterResp,
             'bind_receiver': BindReceiver,
@@ -577,6 +578,42 @@ class GenericNAck(Command):
         super(GenericNAck, self).__init__(command, need_sequence=False,
             **kwargs)
 
+class AlertNotification(Command):
+    """Notify about a MC which become available and has a delivery pending flag."""
+
+    _defs = []
+
+    params = {
+        'source_addr_ton': Param(type=int, size=1),
+        'source_addr_npi': Param(type=int, size=1),
+        'source_addr': Param(type=str, max=65),
+        'esme_addr_ton': Param(type=int, size=1),
+        'esme_addr_npi': Param(type=int, size=1),
+        'esme_addr': Param(type=str, max=65),
+
+        # Optional params
+        'ms_availability_status': Param(type=int, size=1),
+    }
+
+    params_order = (
+            'source_addr_ton',
+            'source_addr_npi',
+            'source_addr',
+            'esme_addr_ton',
+            'esme_addr_npi',
+            'esme_addr',
+
+            # Optional TLV
+            'ms_availability_status',
+            )
+
+    def __init__(self, command, **kwargs):
+        """Initialize"""
+
+        super(AlertNotification, self).__init__(command, need_sequence=False,
+            **kwargs)
+
+        self._set_vars(**(dict.fromkeys(self.params)))
 
 class SubmitSM(Command):
     """submit_sm command class

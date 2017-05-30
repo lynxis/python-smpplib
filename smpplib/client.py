@@ -254,6 +254,10 @@ class Client(object):
         """Set new function to handle message sent event"""
         self.message_sent_handler = func
 
+    def set_message_alert_handler(self, func):
+        """Set new function to handle message alert event"""
+        self.message_alert_handler = func
+
     @staticmethod
     def message_received_handler(pdu, **kwargs):
         """Custom handler to process received message. May be overridden"""
@@ -265,6 +269,13 @@ class Client(object):
         """Called when SMPP server accept message (SUBMIT_SM_RESP).
         May be overridden"""
         logger.warning('Message sent handler (Override me)')
+
+    @staticmethod
+    def message_alert_handler(pdu, **kwargs):
+        """Called when SMPP server notify us about a MS changed it's state
+        May be overridden"""
+        logger.warning('Message alert handler (Override me)')
+
 
     def listen(self, ignore_error_codes=None):
         """Listen for PDUs and act"""
@@ -291,6 +302,8 @@ class Client(object):
                     self.message_sent_handler(pdu=p)
                 elif p.command == 'deliver_sm':
                     self._message_received(p)
+                elif p.command == 'alert_notification':
+                    self.message_alert_handler(p)
                 elif p.command == 'enquire_link':
                     self._enquire_link_received()
                 elif p.command == 'enquire_link_resp':
